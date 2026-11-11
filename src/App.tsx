@@ -102,6 +102,16 @@ export default function App() {
     }
   }, [syncToast]);
 
+  // Workflow: Automatic Daily Rollover on App Mount & Active Check
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    if (selectedSeason === '2026-2027' && today >= '2026-10-20' && today <= '2027-04-11') {
+      if (today > seasonCutoffDate) {
+        setSeasonCutoffDate(today);
+      }
+    }
+  }, [selectedSeason]);
+
   // Re-run season simulation when season, sensitivity, cutoff date, or overrides change
   useEffect(() => {
     try {
@@ -131,23 +141,31 @@ export default function App() {
     }
   }, [injurySensitivity, selectedSeason, seasonCutoffDate, statusOverrides]);
 
-  // Handler: Global Refresh Data
+  // Handler: Global Refresh Data with Daily Rollover Workflow
   const handleRefreshData = (targetCutoff?: string) => {
     setIsRefreshing(true);
-    const newCutoff = targetCutoff || CURRENT_SEASON_CUTOFF;
+    const today = new Date().toISOString().slice(0, 10);
+    let newCutoff = targetCutoff;
+    if (!newCutoff) {
+      if (selectedSeason === '2026-2027') {
+        newCutoff = (today >= '2026-10-20' && today <= '2027-04-11') ? today : CURRENT_SEASON_CUTOFF;
+      } else {
+        newCutoff = '2026-04-15';
+      }
+    }
     setStatusOverrides({});
     setTimeout(() => {
-      setSeasonCutoffDate(newCutoff);
+      setSeasonCutoffDate(newCutoff!);
       const weights = {
         ...DEFAULT_OPTIMIZED_WEIGHTS,
         injuryImpactWeight: injurySensitivity === 'high' ? 1.18 : 0.95
       };
-      const data = buildChronologicalSeason(weights, selectedSeason, newCutoff, {});
+      const data = buildChronologicalSeason(weights, selectedSeason, newCutoff!, {});
       setGames(data.games);
       setStandings(data.finalTeamStandings);
       setTrainingData(data.trainingComparison);
       
-      const rep = auditScheduledGames(data.games, newCutoff);
+      const rep = auditScheduledGames(data.games, newCutoff!);
       setAuditReport(rep);
 
       if (selectedGame) {
@@ -157,11 +175,11 @@ export default function App() {
       
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      setLastSyncTime(`Hoy a las ${timeStr}`);
+      setLastSyncTime(`Sincronizado hoy a las ${timeStr}`);
       setIsRefreshing(false);
       setSyncToast({
-        message: '¡Datos y Partidos Finalizados Actualizados!',
-        sub: `Partidos finalizados oficiales y ${rep.scheduledCount} programados auditados y sincronizados correctamente. Hoy: ${rep.todayCount} juegos.`
+        message: '⚡ Workflow de Cierre y Apertura Diaria Completado',
+        sub: `Fecha de corte actualizada al ${newCutoff}. Partidos finalizados actualizados y próximos partidos listos para hoy.`
       });
     }, 400);
   };
@@ -553,15 +571,6 @@ export default function App() {
               </button>
             )}
 
-            <button
-              onClick={() => exportStandaloneHtml(games, standings, trainingData || undefined, selectedSeason)}
-              className="px-3.5 py-2 rounded-xl bg-[var(--green)] text-black font-bold text-[12px] tracking-wide flex items-center gap-1.5 shadow-[0_0_20px_rgba(34,255,102,0.25)] hover:bg-[#34ff74] transition-all active:scale-95 cursor-pointer"
-              title="Descargar archivo HTML independiente con optimización para subir a tu GitHub"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden md:inline">Exportar HTML GitHub</span>
-              <span className="md:hidden">Exportar</span>
-            </button>
           </div>
         </div>
 
@@ -629,173 +638,12 @@ export default function App() {
       {/* Main Content Body */}
       <main className="flex-1 mx-auto max-w-[1440px] w-full px-4 md:px-6 py-6 md:py-8 space-y-6">
 
-        {/* Dual-Season Notice Banner */}
-        <div className={`p-4 rounded-2xl border transition-all ${
-          selectedSeason === '2026-2027'
-            ? 'bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent border-amber-500/30'
-            : 'bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-transparent border-blue-500/30'
-        }`}>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <div className={`p-2.5 rounded-xl ${
-                selectedSeason === '2026-2027' ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'
-              }`}>
-                {selectedSeason === '2026-2027' ? <Sparkles className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-[14px] font-bold text-white">
-                    {selectedSeason === '2026-2027' 
-                      ? '🏀 Temporada 2026-2027 en Producción Oficial'
-                      : '📁 Respaldo Histórico Oficial: Temporada 2025-2026'}
-                  </h2>
-                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
-                    selectedSeason === '2026-2027' 
-                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40' 
-                      : 'bg-blue-400/20 text-blue-300 border border-blue-400/40'
-                  }`}>
-                    {selectedSeason === '2026-2027' ? 'PRODUCCIÓN • ROSTERS ACTUALIZADOS' : '1,230 PARTIDOS AUDITADOS'}
-                  </span>
-                </div>
-                <p className="text-[12px] text-[var(--text-dim)] mt-1 max-w-4xl leading-relaxed">
-                  {selectedSeason === '2026-2027' ? (
-                    <>
-                      Versión oficial en producción para 2026-2027: incluye todas las franquicias con plantillas renovadas (novato estelar <strong>Cooper Flagg</strong> en Brooklyn, <strong>Victor Wembanyama</strong> en San Antonio, <strong>Karl-Anthony Towns</strong> en New York, <strong>Paul George</strong> en Philadelphia, <strong>Klay Thompson</strong> en Dallas) y proyecciones con <strong>Overlap Bayesiano sustentado en el respaldo 2025-2026</strong>.
-                    </>
-                  ) : (
-                    <>
-                      Respaldo histórico intacto y auditable: calendario íntegro de 1,230 partidos oficiales de Basketball-Reference (BBR) con box scores de jugadores, análisis de bajas médicas y validación empírica del modelo predictivo (78.4% de acierto real).
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-[var(--text-dim)] font-mono">Cambiar temporada:</span>
-              <button
-                onClick={() => handleSeasonChange(selectedSeason === '2026-2027' ? '2025-2026' : '2026-2027')}
-                className={`px-3 py-1.5 rounded-lg text-[11px] font-mono font-bold flex items-center gap-1.5 transition-all border cursor-pointer ${
-                  selectedSeason === '2026-2027'
-                    ? 'bg-blue-500/15 text-blue-300 border-blue-500/30 hover:bg-blue-500/25'
-                    : 'bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25'
-                }`}
-              >
-                <Database className="w-3.5 h-3.5" />
-                <span>Ver {selectedSeason === '2026-2027' ? 'Respaldo 2025-2026' : 'Producción 2026-2027'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
 
 
         {/* TAB 1: GAMES & PREDICTIONS */}
         {activeMainTab === 'games' && (
           <div className="space-y-6">
-            
-            {/* Top Overview Cards */}
-            <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
-                <span className="text-[10px] font-mono tracking-widest text-[var(--text-faint)] uppercase block">
-                  {selectedSeason === '2026-2027' ? 'PRECISIÓN JUGADOS (SU)' : 'PRECISIÓN OPTIMIZADA (SU)'}
-                </span>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-[26px] font-extrabold text-[var(--green)] font-mono">
-                    {modelMetrics.accuracy}%
-                  </span>
-                  <span className="text-[11px] text-[var(--text-dim)] font-mono">
-                    ({modelMetrics.hits} / {modelMetrics.total} finalizados)
-                  </span>
-                </div>
-                <p className="mt-1 text-[11px] text-[var(--text-dim)]">
-                  {selectedSeason === '2026-2027'
-                    ? 'Evaluada únicamente sobre partidos concluidos (corte actual 22 Oct 2026).'
-                    : 'Eficiencia predictiva incorporando bajas y rotación de jugadores al momento del partido.'}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
-                <span className="text-[10px] font-mono tracking-widest text-[var(--text-faint)] uppercase block">
-                  CUBIERTO CONTRA HÁNDICAP (ATS)
-                </span>
-                <div className="mt-1 flex items-baseline gap-2">
-                  <span className="text-[26px] font-extrabold text-[var(--accent)] font-mono">
-                    {modelMetrics.atsAccuracy}%
-                  </span>
-                  <span className="text-[11px] text-[var(--text-dim)] font-mono">
-                    en {modelMetrics.total} jugados
-                  </span>
-                </div>
-                <p className="mt-1 text-[11px] text-[var(--text-dim)]">
-                  Acierto contra el spread calibrado por ausencias de jugadores clave.
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
-                <span className="text-[10px] font-mono tracking-widest text-[var(--text-faint)] uppercase block">
-                  {selectedSeason === '2026-2027' ? 'PARTIDOS PROGRAMADOS' : 'GANANCIA POR ENTRENAMIENTO'}
-                </span>
-                <div className="mt-1 flex items-baseline gap-2">
-                  {selectedSeason === '2026-2027' ? (
-                    <>
-                      <span className="text-[26px] font-extrabold text-cyan-400 font-mono">
-                        {modelMetrics.scheduledCount}
-                      </span>
-                      <span className="text-[11px] text-[var(--text-dim)] font-mono">por jugar</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-[26px] font-extrabold text-[var(--green)] font-mono">
-                        +{trainingData ? Math.round((trainingData.optimizedAccuracy - trainingData.baselineAccuracy) * 10) / 10 : 0}%
-                      </span>
-                      <span className="text-[11px] text-[var(--text-dim)] font-mono">sobre modelo base</span>
-                    </>
-                  )}
-                </div>
-                <p className="mt-1 text-[11px] text-[var(--text-dim)]">
-                  {selectedSeason === '2026-2027'
-                    ? 'Partidos futuros con proyecciones activas (sin marcadores ficticios).'
-                    : 'Incremento cuantitativo obtenido al incluir reporte médico y PER activo.'}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono tracking-widest text-[var(--text-faint)] uppercase block">
-                      {selectedSeason === '2026-2027' ? 'ESTADO & CORTE TEMPORAL' : 'CRONOLOGÍA & BAJAS'}
-                    </span>
-                    {selectedSeason === '2026-2027' && (
-                      <button
-                        onClick={() => handleRefreshData()}
-                        disabled={isRefreshing}
-                        className="text-[10px] font-mono font-bold text-[var(--green)] hover:underline flex items-center gap-1 cursor-pointer"
-                        title="Refrescar datos ahora"
-                      >
-                        <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-                        <span>Refrescar</span>
-                      </button>
-                    )}
-                  </div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    {selectedSeason === '2026-2027' ? (
-                      <span className="text-[16px] font-bold text-emerald-400 flex items-center gap-1.5 font-mono">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Auditado: {seasonCutoffDate} (14 Finalizados)
-                      </span>
-                    ) : (
-                      <span className="text-[20px] font-bold text-[var(--green)] flex items-center gap-1.5">
-                        <CheckCircle2 className="w-5 h-5 text-[var(--green)]" /> 100% Activas
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-[11px] text-[var(--text-dim)]">
-                    {selectedSeason === '2026-2027'
-                      ? `Partidos concluidos hasta el ${seasonCutoffDate}. Los juegos de hoy (CLE@PHI 19:00 ET y DEN@OKC 21:30 ET) y fechas siguientes se auditan rigurosamente como Por Jugar.`
-                      : 'Estadísticas acumuladas antes de cada partido y bajas con 0 min.'}
-                  </p>
-                </div>
-              </div>
-            </section>
 
             {/* Filter Bar */}
             <section className="space-y-3">

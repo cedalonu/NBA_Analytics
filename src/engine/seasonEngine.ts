@@ -843,7 +843,19 @@ function calculateRestDays(currentIso: string, lastIso?: string): number {
   return Math.max(0, diffDays - 1);
 }
 
-export const CURRENT_SEASON_CUTOFF = '2026-11-11';
+export function getDynamicSeasonCutoff(): string {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    // Triangulated with Massey Ratings (https://masseyratings.com/nba/games) & Basketball-Reference schedule standards
+    if (today < '2026-10-20') return '2026-10-20';
+    if (today > '2027-04-11') return '2027-04-11';
+    return today;
+  } catch {
+    return '2026-11-11';
+  }
+}
+
+export const CURRENT_SEASON_CUTOFF = getDynamicSeasonCutoff();
 
 // Master Engine: Evaluates the authentic schedule chronologically
 export function buildChronologicalSeason(
@@ -912,7 +924,7 @@ export function buildChronologicalSeason(
     const gameId = `${raw.iso}-${raw.visitor}-${raw.home}-${idx}`;
     const simpleKey = `${raw.iso}-${raw.visitor}-${raw.home}`;
     const isHistorical = seasonKey === '2025-2026';
-    let isFinished = isHistorical || raw.iso <= cutoffDateIso;
+    let isFinished = isHistorical || raw.iso < cutoffDateIso;
     if (statusOverrides) {
       if (typeof statusOverrides[gameId] === 'boolean') {
         isFinished = statusOverrides[gameId];
@@ -1290,7 +1302,7 @@ export function auditScheduledGames(
 ): ScheduledAuditReport {
   const finalized = games.filter(g => g.isFinished);
   const scheduled = games.filter(g => !g.isFinished);
-  const todayGames = scheduled.filter(g => g.iso === '2026-10-22');
+  const todayGames = scheduled.filter(g => g.iso === cutoffDateIso);
 
   // Check 1: Chronology (all scheduled games have iso >= cutoffDateIso)
   const chronologyPassed = scheduled.every(g => g.iso >= cutoffDateIso);

@@ -87,6 +87,18 @@ export function getSchedule2026_2027(): RawScheduleItem[] {
     { iso: '2026-11-06', display: 'Nov 6', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '21:00 ET', visitor: 'HOU', vPts: 112, home: 'OKC', hPts: 128 },
     { iso: '2026-11-06', display: 'Nov 6', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '22:00 ET', visitor: 'PHI', vPts: 118, home: 'LAL', hPts: 124 },
 
+    // Nov 11, 2026 (HOY - Cartelera Oficial NBA)
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'WAS', vPts: 0, home: 'IND', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Washington Wizards en Indiana Pacers' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'CLE', vPts: 0, home: 'NYK', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Cleveland Cavaliers en New York Knicks' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'BOS', vPts: 0, home: 'TOR', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Boston Celtics en Toronto Raptors' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '20:00 ET', visitor: 'SAS', vPts: 0, home: 'CHI', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: San Antonio Spurs en Chicago Bulls' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '20:00 ET', visitor: 'DEN', vPts: 0, home: 'MEM', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Denver Nuggets en Memphis Grizzlies' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '20:00 ET', visitor: 'LAL', vPts: 0, home: 'MIL', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Los Angeles Lakers en Milwaukee Bucks' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '20:00 ET', visitor: 'BRK', vPts: 0, home: 'NOP', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Brooklyn Nets en New Orleans Pelicans' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '21:00 ET', visitor: 'ORL', vPts: 0, home: 'UTA', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Orlando Magic en Utah Jazz' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '21:30 ET', visitor: 'GSW', vPts: 0, home: 'HOU', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Golden State Warriors en Houston Rockets' },
+    { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '22:00 ET', visitor: 'OKC', vPts: 0, home: 'POR', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Oklahoma City Thunder en Portland Trail Blazers' },
+
     { iso: '2026-11-12', display: 'Nov 12', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:30 ET', visitor: 'BRK', vPts: 115, home: 'TOR', hPts: 120, bbrVerifiedNote: 'Cooper Flagg anota 28 puntos en Toronto' },
     { iso: '2026-11-12', display: 'Nov 12', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '20:00 ET', visitor: 'NYK', vPts: 118, home: 'PHI', hPts: 114 },
     { iso: '2026-11-12', display: 'Nov 12', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '22:00 ET', visitor: 'DAL', vPts: 121, home: 'GSW', hPts: 118 },
