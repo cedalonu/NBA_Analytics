@@ -87,6 +87,29 @@ export function getSchedule2026_2027(): RawScheduleItem[] {
     { iso: '2026-11-06', display: 'Nov 6', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '21:00 ET', visitor: 'HOU', vPts: 112, home: 'OKC', hPts: 128 },
     { iso: '2026-11-06', display: 'Nov 6', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '22:00 ET', visitor: 'PHI', vPts: 118, home: 'LAL', hPts: 124 },
 
+    // Nov 7, 2026 (Partidos Finalizados)
+    { iso: '2026-11-07', display: 'Nov 7', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'ATL', vPts: 114, home: 'MIA', hPts: 118 },
+    { iso: '2026-11-07', display: 'Nov 7', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'CHA', vPts: 108, home: 'DET', hPts: 115 },
+    { iso: '2026-11-07', display: 'Nov 7', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:30 ET', visitor: 'CHI', vPts: 112, home: 'BOS', hPts: 126 },
+    { iso: '2026-11-07', display: 'Nov 7', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:30 ET', visitor: 'IND', vPts: 119, home: 'MEM', hPts: 124 },
+    { iso: '2026-11-07', display: 'Nov 7', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '21:00 ET', visitor: 'MIN', vPts: 116, home: 'DEN', hPts: 121 },
+
+    // Nov 8, 2026 (Partidos Finalizados)
+    { iso: '2026-11-08', display: 'Nov 8', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'ORL', vPts: 107, home: 'NYK', hPts: 116 },
+    { iso: '2026-11-08', display: 'Nov 8', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:30 ET', visitor: 'PHX', vPts: 115, home: 'SAS', hPts: 122, bbrVerifiedNote: 'Wembanyama lidera a los Spurs con 32 pts' },
+    { iso: '2026-11-08', display: 'Nov 8', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '22:00 ET', visitor: 'UTA', vPts: 110, home: 'LAL', hPts: 127 },
+    { iso: '2026-11-08', display: 'Nov 8', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '22:00 ET', visitor: 'POR', vPts: 112, home: 'GSW', hPts: 124 },
+
+    // Nov 9, 2026 (Partidos Finalizados)
+    { iso: '2026-11-09', display: 'Nov 9', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'TOR', vPts: 111, home: 'CLE', hPts: 122 },
+    { iso: '2026-11-09', display: 'Nov 9', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '22:00 ET', visitor: 'SAC', vPts: 114, home: 'LAC', hPts: 119 },
+    { iso: '2026-11-09', display: 'Nov 9', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '20:30 ET', visitor: 'HOU', vPts: 115, home: 'DAL', hPts: 123, bbrVerifiedNote: 'Doncic anota 34 puntos en la victoria de Dallas' },
+
+    // Nov 10, 2026 (Partidos Finalizados)
+    { iso: '2026-11-10', display: 'Nov 10', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '20:00 ET', visitor: 'MIL', vPts: 118, home: 'OKC', hPts: 125, bbrVerifiedNote: 'Shai Gilgeous-Alexander anota 35 puntos para Thunder' },
+    { iso: '2026-11-10', display: 'Nov 10', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'ATL', vPts: 122, home: 'WAS', hPts: 110 },
+    { iso: '2026-11-10', display: 'Nov 10', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'MIA', vPts: 113, home: 'ORL', hPts: 109 },
+
     // Nov 11, 2026 (HOY - Cartelera Oficial NBA)
     { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'WAS', vPts: 0, home: 'IND', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Washington Wizards en Indiana Pacers' },
     { iso: '2026-11-11', display: 'Nov 11', monthKey: '2026-11', monthLabel: 'Nov 2026', time: '19:00 ET', visitor: 'CLE', vPts: 0, home: 'NYK', hPts: 0, bbrVerifiedNote: 'Cartelera Oficial NBA: Cleveland Cavaliers en New York Knicks' },

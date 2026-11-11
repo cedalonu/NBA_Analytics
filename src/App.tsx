@@ -72,6 +72,7 @@ export default function App() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'finished' | 'scheduled'>('all');
   const [predictionFilter, setPredictionFilter] = useState<'all' | 'hit' | 'miss'>('all');
   const [injuryFilter, setInjuryFilter] = useState<'all' | 'withInjuries' | 'healthy'>('all');
+  const [confidenceFilter, setConfidenceFilter] = useState<'all' | 'ALTA' | 'MEDIA' | 'VALOR'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   
   // Games Table Sorting
@@ -227,8 +228,24 @@ export default function App() {
     setStatusFilter('all');
     setPredictionFilter('all');
     setInjuryFilter('all');
+    setConfidenceFilter('all');
     setCurrentPage(1);
   };
+
+  // Confidence Breakdown calculation for training tab
+  const confidenceBreakdown = useMemo(() => {
+    const finished = games.filter(g => g.isFinished);
+    const tiers = ['ALTA', 'MEDIA', 'VALOR'] as const;
+    return tiers.map(tier => {
+      const tierGames = finished.filter(g => g.prediction.confidence === tier);
+      const hits = tierGames.filter(g => g.prediction.correctWinner).length;
+      const total = tierGames.length;
+      const accuracy = total > 0 ? Math.round((hits / total) * 1000) / 10 : 0;
+      const atsHits = tierGames.filter(g => g.prediction.spreadCovered).length;
+      const atsAccuracy = total > 0 ? Math.round((atsHits / total) * 1000) / 10 : 0;
+      return { tier, total, hits, accuracy, atsAccuracy };
+    });
+  }, [games]);
 
   // Filtered games
   const filteredGames = useMemo(() => {
@@ -247,6 +264,8 @@ export default function App() {
       const totalInjs = (g.visitorInjuries?.length || 0) + (g.homeInjuries?.length || 0);
       if (injuryFilter === 'withInjuries' && totalInjs === 0) return false;
       if (injuryFilter === 'healthy' && totalInjs > 0) return false;
+      // Confidence Filter
+      if (confidenceFilter !== 'all' && g.prediction.confidence !== confidenceFilter) return false;
       // Search
       if (searchQuery.trim() !== '') {
         const q = searchQuery.toLowerCase();
@@ -265,7 +284,7 @@ export default function App() {
       }
       return true;
     });
-  }, [games, selectedMonth, selectedTeamFilter, statusFilter, predictionFilter, injuryFilter, searchQuery, activeTeamMap]);
+  }, [games, selectedMonth, selectedTeamFilter, statusFilter, predictionFilter, injuryFilter, confidenceFilter, searchQuery, activeTeamMap]);
 
 
   // Sort games
@@ -780,6 +799,42 @@ export default function App() {
                       Con Bajas 🚑
                     </button>
                   </div>
+
+                  {/* Confidence Filter */}
+                  <div className="flex items-center gap-1 bg-[#161622] p-0.5 rounded-lg border border-[var(--border)]">
+                    <button
+                      onClick={() => setConfidenceFilter('all')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                        confidenceFilter === 'all' ? 'bg-[var(--surface-3)] text-white font-bold' : 'text-[var(--text-dim)]'
+                      }`}
+                    >
+                      Toda Confianza
+                    </button>
+                    <button
+                      onClick={() => setConfidenceFilter('ALTA')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                        confidenceFilter === 'ALTA' ? 'bg-emerald-500/20 text-emerald-300 font-bold' : 'text-[var(--text-dim)]'
+                      }`}
+                    >
+                      Alta 🟢
+                    </button>
+                    <button
+                      onClick={() => setConfidenceFilter('MEDIA')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                        confidenceFilter === 'MEDIA' ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-[var(--text-dim)]'
+                      }`}
+                    >
+                      Media 🟡
+                    </button>
+                    <button
+                      onClick={() => setConfidenceFilter('VALOR')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                        confidenceFilter === 'VALOR' ? 'bg-cyan-500/20 text-cyan-300 font-bold' : 'text-[var(--text-dim)]'
+                      }`}
+                    >
+                      Valor 🔵
+                    </button>
+                  </div>
                 </div>
 
                 <div className="text-[11px] text-[var(--text-dim)] font-mono ml-auto">
@@ -1174,6 +1229,47 @@ export default function App() {
                 </p>
               </div>
 
+            </div>
+
+            {/* Confidence Level Accuracy Breakdown */}
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 space-y-4">
+              <div className="flex items-center gap-2 pb-3 border-b border-[var(--border)]">
+                <BarChart3 className="w-5 h-5 text-[var(--green)]" />
+                <h3 className="font-bold text-white text-[16px]">
+                  Desglose de Acierto por Nivel de Confianza (Optimización & Calibración)
+                </h3>
+              </div>
+              <p className="text-[12px] text-[var(--text-dim)]">
+                Análisis empírico del nivel de acierto del modelo predictivo de acuerdo al grado de confianza (Alta, Media, Valor), permitiendo auditar y calibrar los umbrales de decisión.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {confidenceBreakdown.map((item) => (
+                  <div key={item.tier} className="p-4 rounded-xl border border-white/5 bg-[#141420] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[11px] font-mono px-2 py-0.5 rounded font-bold ${
+                        item.tier === 'ALTA' ? 'bg-emerald-500/20 text-emerald-300' :
+                        item.tier === 'MEDIA' ? 'bg-amber-500/20 text-amber-300' : 'bg-cyan-500/20 text-cyan-300'
+                      }`}>
+                        CONFIANZA {item.tier}
+                      </span>
+                      <span className="text-[12px] font-mono font-bold text-white">
+                        {item.total} partidos
+                      </span>
+                    </div>
+                    <div className="text-[28px] font-black font-mono text-[var(--green)]">
+                      {item.accuracy}% <span className="text-[12px] font-normal text-[var(--text-dim)]">SU</span>
+                    </div>
+                    <div className="flex justify-between text-[11px] font-mono text-[var(--text-dim)] border-t border-white/5 pt-2">
+                      <span>Acierto Spread (ATS):</span>
+                      <span className="text-[var(--accent)] font-bold">{item.atsAccuracy}%</span>
+                    </div>
+                    <div className="flex justify-between text-[11px] font-mono text-[var(--text-dim)]">
+                      <span>Aciertos / Total:</span>
+                      <span className="text-white font-bold">{item.hits} / {item.total}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Feature Weights Trained Table */}
